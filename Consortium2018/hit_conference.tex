@@ -1,0 +1,445 @@
+\documentclass[aspectratio=43]{beamer}
+\usetheme{Boadilla}
+%\usepackage{slashbox}
+%\usepackage{hanging}
+%\usepackage{algorithm,algorithmic}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{fancybox}
+\usepackage{mathrsfs}
+\usepackage{makecell}
+\usepackage{listings}
+%\usepackage[rightcaption]{sidecap}
+%\usepackage{enumitem}
+% set first line indentation
+\parindent=20pt
+\setbeamersize{text margin left=20pt,text margin right=20pt}
+
+\logo {\includegraphics[height=0.8cm]{./Fig/hitlogo.eps}}
+% items enclosed in square brackets are optional; explanation below
+\title[Anisotropic elastic RTM]{Localized low-rank approximation and applications in anisotropic elastic RTMs}
+%\subtitle[subs]{Parallelization with domain decomposition}
+\author[W. Wang]{Wenlong Wang \inst{1} \\{George McMechan \inst{2}} \\{Biaolong Hua \inst{3}}\\{Paul Williamson \inst{3}}}
+\titlegraphic{\includegraphics[height=0.8cm]{./Fig/hitlogo.eps}}
+
+\institute[HIT]{\inst{1} Harbin Institute of Techonology \and
+\inst{2} Center for Lithospheric Studies (UT-Dallas) \and
+\inst{3} Total E\&P USA, Inc.
+}
+\date[Oct 2017]{Oct 21, 2017}
+
+\begin{document}
+
+% remove figure caption
+\setbeamertemplate{caption}{\insertcaption}
+
+%\frame{
+%\begin{figure}
+%\rule{5cm}{5cm}
+%\caption{Test}
+%\end{figure}
+%}
+
+
+%--- the titlepage frame -------------------------%
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+%\tableofcontents[part=1,pausesections]
+\end{frame}
+%-----------------------------------------------------------
+\section{Motivations}
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+\begin{frame}
+  \frametitle{Motivations}
+\begin{itemize}
+\item{P and S wavefields separation/decomposition is essential for generating PP and PS images in elastic RTMs.}
+\item{A complete and accurate separation/decomposition of anisotropic wavefields with heterogeneity is overwhelmingly expensive. }
+\item{Solid comparisons between anisotropic acoustic and elastic RTMs are missing.}
+\end{itemize}
+\end{frame}
+%-----------------------------------------------------------
+\section{Previous work}
+\begin{frame}
+  \frametitle{Previous work}
+\begin{itemize}
+\item{Dellinger and Etgen (1990) propose divergence-like and curl-like operators in the wavenumber domain based on Christoffel equation to perform separation in anisotropic homogeneous elastic media.}
+\item{Yan and Sava (2008) transform the separation operator from the wavenumber domain to the space domain, and formulate nonstationary filter to separate wavefields in heterogeneous transversely isotropic media with a vertical symmetry axis.}
+\item{Zhang and McMechan (2010) realize the PS decomposition by generalizing Dellinger and Etgen's (1990) theory and applied to VTI wavefields.}
+\item{Cheng and Fomel (2014) use a low-rank approximation to build space-wavenumber mixed-domain operators and significantly reduce the number of FFT operations per time step.}
+\end{itemize}
+\end{frame}
+%-----------------------------------------------------------
+\begin{frame}{A wavefield snapshot in a TTI medium}
+   \begin{figure}[ht]
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_vx_1_756.eps}
+            \caption{vx}
+        \end{minipage}
+        \hspace{0.5cm}
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_vz_1_756.eps}
+            \caption{vz}
+        \end{minipage}
+    \end{figure}
+
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Wavefield separation (Divergence and curl)}
+   \begin{figure}[ht]
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_div_1_756.eps}
+            \caption{Divergence (P)}
+        \end{minipage}
+        \hspace{0.5cm}
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_crl_1_756.eps}
+            \caption{Curl (S)}
+        \end{minipage}
+    \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Wavefield separation (Christoffel equation)}
+   \begin{figure}[ht]
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_p_1_756.eps}
+            \caption{P-wave}
+        \end{minipage}
+        \hspace{0.5cm}
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_s_1_756.eps}
+            \caption{S-wave}
+        \end{minipage}
+    \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Wavefield decomposition (P-wave)}
+   \begin{figure}[ht]
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_pvx_1_756.eps}
+            \caption{vx}
+        \end{minipage}
+        \hspace{0.5cm}
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_pvz_1_756.eps}
+            \caption{vz}
+        \end{minipage}
+    \end{figure}
+
+\end{frame}
+%-----------------------------------------------------------
+\begin{frame}{Wavefield decomposition (S-wave)}
+   \begin{figure}[ht]
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+  	    \includegraphics[width=\textwidth]{./Fig/figure_svx_1_756.eps}
+            \caption{vx}
+        \end{minipage}
+        \hspace{0.5cm}
+        \begin{minipage}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{./Fig/figure_svz_1_756.eps}
+            \caption{vz}
+        \end{minipage}
+    \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}
+\noindent{In anisotropic wavefields, the polarization directions $\boldsymbol{A}$ of each wave mode $\alpha$ need to be calculated by solving for the eigenvectors of matrix $\boldsymbol{\Gamma}$ in the Christoffel equation.}
+\begin{eqnarray*}
+[\boldsymbol{\Gamma}-\rho V_\alpha^2\boldsymbol{I}]\boldsymbol{A}^\alpha=0.
+\end{eqnarray*}
+$\boldsymbol{I}$ is the unit diagonal matrix; $\Gamma_{ik}=C_{ijkl}K_jK_l$, where $C_{ijkl}$ is the elastic stiffness tensor with $i,j,k,l = x,y,z$. $\rho V_\alpha^2$ is an eigenvalue of matrix $\boldsymbol{\Gamma}$. Each eigenvalue represents a wave mode, and its polarization is described with the corresponding eigenvector $\boldsymbol{A}^\alpha$.
+
+\end{frame}
+
+%-----------------------------------------------------------
+\begin{frame}{Cost analysis}
+\noindent{Complete calculation of the mixed domain operator $\mathbf{A}$ with brute force is extremely expensive (impossible), as the cost for each time (image) step reaches }
+\begin{eqnarray*}
+O(N^2\log N),
+\end{eqnarray*}
+where $N$ is the number of computational grid points. In the following presentation, we show how to reduce it to
+\begin{eqnarray*}
+ O(RN\log N),
+\end{eqnarray*}
+with $R<<N$ using a low-rank approxmation, and further to 
+\begin{eqnarray*}
+O(R^\prime N \log N^\prime),
+\end{eqnarray*}
+with $R^\prime<R$, and $N^\prime=\frac{N}{M}$ using a localized lowrank-approximation, with acceptable accuracy.
+\end{frame}
+%-----------------------------------------------------------
+\section{Localized low-rank approximation}
+\begin{frame}{Low-rank approximation}
+\begin{eqnarray*}
+U^{qP}_x(\mathbf{x})&=\int e^{i\mathbf{kx}}W_x(\mathbf{x,k})U_x(\mathbf{k})d\mathbf{k}\\
+                    &+\int e^{i\mathbf{kx}}W_y(\mathbf{x,k})U_y(\mathbf{k})d\mathbf{k}\\
+                    &+\int e^{i\mathbf{kx}}W_z(\mathbf{x,k})U_z(\mathbf{k})d\mathbf{k}
+\end{eqnarray*}
+\noindent{The mixed-domain operators $W_j$ ($j=x,y,z$) have the low-rank separated representation}
+\begin{eqnarray*}
+W_j(\mathbf{x,k})\approx \sum^{R_k}_{m=1}\sum^{R_x}_{n=1}B(\mathbf{x,k}_{m})D_{m n}C(\mathbf{x}_{n},\mathbf{k})
+\end{eqnarray*}
+$B$ is a mixed-domain operator with reduced wavenumber dimension $R_k$; $C$ is another mixed-domain operator with reduced spatial dimension $R_x$; $D_{m n}$ is a $R_k \times R_x$ matrix. 
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Localized low-rank approximation}
+
+\begin{columns}
+  \begin{column}{0.50\textwidth}
+The main new development in this report is to perform localized low-rank approximations rather than global ones. This means to divide the model into several rectangular blocks, and perform low-rank decomposition separately and locally in each block. 
+  \end{column}
+  \begin{column}{0.50\textwidth}
+  \begin{figure}
+  \includegraphics[width=0.8\textwidth]{./Fig/model_decomposition.eps}
+  \end{figure}
+  \end{column}
+\end{columns}
+
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Localized low-rank approximation}
+\noindent{To solve the boundary artifacts, we use the windowed Fourier transform (WFT), which is invertible by using the overlap-add (OLA) method (Crochiere, 1980).}
+%%\begin{columns}
+%%  \begin{column}{0.40\textwidth}
+%%   \small{
+%%    \begin{eqnarray*}
+%%    w(x)=\begin{cases}
+%%    0, & \mathrm{if} \ x < \beta-\phi, \\
+%%    sin\big[\frac{\pi}{4\phi}(x-\beta+\phi)\big], & \mathrm{if} \ \beta-\phi \le x \le \beta+\phi, \\
+%%    1, & \mathrm{if} \ \beta+\phi < x < \gamma-\phi, \\
+%%    cos\big[\frac{\pi}{4\phi}(x-\gamma+\phi)\big], & \mathrm{if} \ \gamma-\phi \le x \le \gamma+\phi, \\
+%%    0, & \mathrm{if} \ x > \gamma+\phi.
+%%    \end{cases}
+%%    \end{eqnarray*}
+%%    }
+%%  \end{column}
+%%  \begin{column}{0.40\textwidth}
+  \begin{figure}
+  \includegraphics[width=0.8\textwidth]{./Fig/window_sketch2.eps}
+  \end{figure}
+%  \end{column}
+%\end{columns}
+
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Effects of overlapping}
+  \begin{figure}
+  \includegraphics[width=0.8\textwidth]{./Fig/impact_length2.eps}
+  \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Advantages}
+\begin{itemize}
+\item{LLA performs shorter FFTs than GLA.}
+\item{The algorithm (LLA) is compatiable with parallel computation with domain-decomposition.}
+\item{The number of ranks for low-rank approximation is further reduced.}
+\end{itemize}
+\end{frame}
+%%-----------------------------------------------------------
+%\begin{frame}{BP model test}
+%  \begin{figure}
+%  \includegraphics[width=1.0\textwidth]{./Fig/bp2.eps}
+%  \caption {(a) The BP $V_{P0}$ model and (b) the $V_{P0}$ distribution between 1500 m/s to 4500 m/s.}
+%  \end{figure}
+%\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{BP model test}
+  \begin{figure}
+  \includegraphics[width=1.0\textwidth]{./Fig/bp2.eps}
+  \caption {(a) The BP $V_{P0}$ model and (b) the $V_{P0}$ distribution between 1500 m/s to 4500 m/s.}
+  \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{BP model test}
+  \begin{figure}
+  \includegraphics[width=1.0\textwidth]{./Fig/bp_dec2.eps}
+  \caption {
+(a) The blocked BP $V_{P0}$ models (into 16 parts) and (b) their corresponding $V_{P0}$ distributions.
+}
+  \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{GLA (R = 5)}
+   \begin{figure}[ht]
+   \includegraphics[width=0.7\textwidth]{./Fig/bp_snap_c1r5.eps}
+%   \caption{P-wave}
+   \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{LLA (R = 5)}
+   \begin{figure}[ht]
+   \includegraphics[width=0.7\textwidth]{./Fig/bp_snap_c16r5.eps}
+%   \caption{P-wave}
+   \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{LLA (R = 8)}
+   \begin{figure}[ht]
+   \includegraphics[width=0.7\textwidth]{./Fig/bp_snap_c16r8.eps}
+%   \caption{P-wave}
+   \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Cost analysis}
+\tiny{
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+      \hline
+       &
+      \makecell{GLA \\ (1 core, R=5)}&
+      \makecell{GLA \\ (1 core, R=8)}&
+      \makecell{LLA \\ (16 cores, R=5)}&
+      \makecell{LLA \\ (16 cores, R=8)}\\
+      \hline
+      \makecell{Wall clock time}&
+       43.38 s&
+       70.13 s&
+       4.31 s&
+       7.26 s\\
+      \hline
+      \makecell{Total CPU time}&
+       43.38 s&
+       70.13 s&
+       68.96 s&
+       116.16 s\\
+      \hline
+    \end{tabular}
+  \end{center}
+}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{PS decomposition in 3D SEAM model}
+   \begin{figure}[ht]
+   \includegraphics[width=0.9\textwidth]{../Project5_LLA/Fig/snap_seam.eps}
+   \end{figure}
+\end{frame}
+%%-----------------------------------------------------------
+\section{Anisotropic elastic RTM}
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+\begin{frame}
+\begin{columns}
+  \begin{column}{0.6\textwidth}
+  \includegraphics[width=0.8\textwidth]{/data/Doc/Project6_LLA_RTM/Fig/model_subsalt.eps}
+  \end{column}
+  \begin{column}{0.4\textwidth}
+\begin{itemize}
+\item{num. of shots: 100}
+\item{traces per shot: 501}
+\item{dt: 1000 ms; nt: 3000}
+\item{rank : 6; comm: 16}
+\item{DD: 4 x 3}
+\end{itemize}
+  \end{column}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+  &  $v_{p0}$ (m/s) & $v_{s0}$ (m/s) & $\rho$ ($\mathrm{kg/m^3}$) & $\epsilon$ & $\delta$  & $\theta(^\circ)$ \\ \hline
+1 & 1500     & 0        & 1000        & 0    & 0     & 0    \\ \hline
+2 & 4500     & 2250     & 1000        & 0    & 0     & 0    \\ \hline
+3 & 2000     & 1000     & 1000        & 0.15 & -0.25 & 30   \\ \hline
+4 & 2500     & 1250     & 1000        & 0.2  & 0.15  & 10   \\ \hline
+\end{tabular}
+\caption{Model parameters}
+\end{table}
+\end{frame}
+%%%-----------------------------------------------------------
+\begin{frame}{Acoustic TTI}
+\center
+  \includegraphics[width=1.0\textwidth]{./Fig/image_acs_subsalt.eps}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Elastic TTI with LLA}
+\center
+  \includegraphics[width=1.0\textwidth]{./Fig/image_els_subsalt.eps}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{SEAM model}
+\begin{columns}
+  \begin{column}{0.6\textwidth}
+  \includegraphics[width=1.0\textwidth]{/data/Doc/Project6_LLA_RTM/Fig/model_seam2d.eps}
+  \end{column}
+  \begin{column}{0.4\textwidth}
+\begin{itemize}
+\item{num. of shots: 320}
+\item{source peak frequency: 15 Hz}
+\item{average offset: 10 km}
+\item{grid internval: 5 m}
+\item{rank : 6}
+\item{DD: 16 x 16}
+\end{itemize}
+  \end{column}
+\end{columns}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Acoustic TTI}
+\center
+  \includegraphics[width=1.0\textwidth]{./Fig/image_acs_seam.eps}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Elastic TTI with LLA}
+\center
+  \includegraphics[width=1.0\textwidth]{./Fig/image_els_seam.eps}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Acoustic TTI (zoom in)}
+\center
+  \includegraphics[width=0.7\textwidth]{./Fig/image_acs_seam_zoom.eps}
+\end{frame}
+%%-----------------------------------------------------------
+\begin{frame}{Elastic TTI with LLA (zoom in)}
+\center
+  \includegraphics[width=0.7\textwidth]{./Fig/image_els_seam_zoom.eps}
+\end{frame}
+%%-----------------------------------------------------------
+
+\section{Conclusions}
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item{We proposed a localized low-rank approximation algorithm that is highly scalable, making P/S decompositions feasible in complicated and large models.
+}
+\item{
+Tests on synthetic data show high-quality decomposition results for anisotropic wavefields.
+}
+\item{
+This approach is applied in anisotropic elastic reverse-time migrations and ERTM demonstrate superior quality than its acoustic counterpart.
+}
+\end{itemize}
+\end{frame}
+%%-----------------------------------------------------------
+%\begin{frame}{Acknowledgment}
+%\noindent{I'd like to thank Prof. Ma for giving me this opportunity to present my work, and all the members of HIT geophysical center for their hard work to make this event happen.
+%} 
+%\end{frame}
+
+%%-----------------------------------------------------------
+\begin{frame}
+\begin{center}
+  \includegraphics[width=1.0\textwidth]{./Fig/Thankyou.eps}
+\end{center}
+\end{frame}
+
+\end{document}
+
