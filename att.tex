@@ -7,14 +7,14 @@
 \usepackage{geometry}
 \usepackage{rotating}
 \usepackage{url}
+\usepackage{vmargin}
+%vmargin={0.1, 0.1}
 
 \begin{document}
 
-%\title{Elastic reverse-time migrations in transversely isotropic media using localized low-rank approximation for P/S separation}
 \title{Reverse-time migrations in transversely isotropic media: A comparison between acoustic and elastic wave equations with two wave mode separation algorithms}
 
 \renewcommand{\thefootnote}{\fnsymbol{footnote}} 
-%\ms{GEO-Example} % manuscript number
 
 \address{
 \footnotemark[1]Formerly Center for Lithospheric Studies, The University of Texas at Dallas, Richardson, Texas, USA; presently Harbin Institute of Technology, Harbin, Heilongjiang, 150001, China. 
@@ -27,35 +27,31 @@ The University of Texas at Dallas, \\
 800 W Campbell Road (ROC21), Richardson, TX 75080
 }
 \author{Wenlong Wang\footnotemark[1] Biaolong Hua\footnotemark[2] George A. McMechan\footnotemark[3] and Paul Williamson\footnotemark[2]}
-%\author{Wenlong Wang\footnotemark[1] Biaolong Hua\footnotemark[2] Paul Williamson\footnotemark[2] and George A. McMechan\footnotemark[1]}
 
-%\footer{Example}
 %\lefthead{Wang \& McMechan}
 \righthead{Anisotropic elastic RTM}
 
 \maketitle
+
 \renewcommand{\figdir}{Fig} % figure directory
 
 %\clearpage
-%\newpage
+%\null\newpage
+%\vspace{10mm}
 
 \begin{abstract}
 \indent\indent
 Anisotropic reverse time migrations (RTMs) using pseudo-acoustic or elastic wave equations are tested, and the migrated PP images, obtained using the same data set as input, are compared. 
-In anisotropic elastic RTMs, both divergence operators and localized low-rank approximations are tested and compared for P/S separation.
-%Two P/S separation algorithms are also compared in anisotropic elastic RTMs. 
-Tests with synthetic data show that elastic RTMs have better illumination than pseudo-acoustic RTMs in subsalt areas, because of the involvement of converted S-waves in the former. Pseudo-acoustic RTMs have diamond-shaped S-wave artifacts which don't exist in elastic RTM images, provided that the P- and S-waves are separated in the elastic wavefields. 
+In anisotropic elastic RTMs, both divergence operators, and localized low-rank approximations, are tested and compared for P/S separation.
+Tests with synthetic data show that elastic RTMs have better illumination apertures than pseudo-acoustic RTMs in subsalt areas, because of the involvement of converted S-waves in the former. Pseudo-acoustic RTMs have diamond-shaped S-wave artifacts which don't exist in elastic RTM images, provided that the P- and S-waves are separated in the elastic wavefields. 
 Localized low-rank approximations provide affordable, accurate P/S separations in anisotropic media, and the separation results are much better than those obtained using divergence operators.
 Anisotropic elastic RTMs with localized low-rank approximation give the best quality images.
-% than pseudo-acoustic RTMs and elastic RTMs with divergence for P/S separation.
-%; localized low-rank approximation makes P/S separation affordable via domain decomposition and parallel computation,  and thus is efficient to be applied in anisotropic elastic RTMs. 
 
-%Tests on synthetic data show that elastic RTMs with localized low-rank approximation for P/S separation give the best migration images.
 \end{abstract}
 
 \section{Introduction}
 \indent\indent
-Reverse time migration (RTM) \citep{mcmechan83, whitmore83,baysal83} applies two-way wave equations to extrapolate the source wavefield forward in time and the receiver wavefield backward in time. The natural properties of RTM in handling lateral velocity variation correctly, and free from dip limitations, make it the preferred migration algorithm for complex subsurface structures.
+Reverse time migration (RTM) \citep{mcmechan83, whitmore83,baysal83} applies two-way wave equations to extrapolate the source wavefield forward in time and the receiver wavefield backward in time. The natural properties of RTM in handling lateral velocity variation correctly, and the lack of dip limitations, make it the preferred migration algorithm for complex subsurface structures.
 
 As a framework for depth imaging, RTM can be applied with different wave equations for the wavefield extrapolations. RTMs built on isotropic acoustic wave equations cannot process seismic anisotropy correctly, and ignoring anisotropy in anisotropic media may cause blurring, distortion and mispositioning in migrated images \citep{huang09}. 
 
@@ -63,21 +59,21 @@ Anisotropic waves are inherently described by elastic wave equations with P- and
 
 %Drawing on a preference for acoustic equations,
 \citet{alkhalifah98} proposed a pseudo-acoustic equation from an approximate dispersion relation for modeling P-waves in transversely isotropic media with a vertical symmetry axis (VTI), by assuming the S-wave velocity along the symmetry axis ($V_{S0}$) is zero. Other authors improved the methodology by deriving various coupled second-order partial differential equations (PDEs) instead of a more complicated fourth-order one \citep{alkhalifah00,klie01,hestholm07,du08,fowler10}, and extend the application to tilted transversely isotropic (TTI) media \citep{zhou06}. In anisotropic media, setting $V_{S0}=0$ eliminates only the S-waves along the symmetry axis; S-waves in other directions form diamond-shaped artifacts \citep{grechka04}. 
-The pseudo-acoustic equations are observed to be unstable \citep{fletcher08, zhang08} in the presence of strong variations of dip and azimuth angle in the axis of symmetry. Attempts were made to stabilize the pseudo-acoustic equations and reduce the S-wave artifacts, because setting $V_{S0}=0$ also significantly increases the amount of anisotropy \citep{alkhalifah00, fletcher09,zhang11}. 
+The pseudo-acoustic equations are observed to be unstable \citep{fletcher08, zhang08} in the presence of strong variations of dip and azimuth angle in the axis of symmetry. Attempts have been made to stabilize the pseudo-acoustic equations and reduce the S-wave artifacts, because setting $V_{S0}=0$ also significantly increases the amount of anisotropy \citep{alkhalifah00, fletcher09,zhang11}. 
 %Some remedies are proposed to remove those artifacts, including placing the source in a thin isotropic layer \citep{alkhalifah00}, 
 
 The problems in simulating anisotropic P-wave propagation with pseudo-acoustic wave equations make it worthwhile to reevaluate the anisotropic elastic wave equation as an engine for anisotropic RTMs, especially with the rapid development of high-performance computing techniques. The elastic wave equations have the advantages that
 
-\begin{hangparas}{.25in}{1}
-a) They are more realistic than acoustic ones for simulating wave propagation in the earth.
+\begin{hangparas}{.23in}{1}
+a) they are more realistic than acoustic ones for simulating wave propagation in the earth,
 %simulate waves that are closer to realistic seismic waves than acoustic wave equations are.
 
-b) Anisotropy is an elastic phenomenon and not an acoustic one.
+b) anisotropy is an elastic phenomenon, not an acoustic one, and
 
-c) The S-waves are a part of the elastic wavefield, and so contain information that is missing from the P-waves alone. Instead of forcing $V_{S0}=0$, a more practical way to obtain physically meaningful images is to separate the P- and S-waves in the elastic wavefields. 
+c) the S-waves are a part of the elastic wavefield, and so contain information that is missing from the P-waves alone. Instead of forcing $V_{S0}=0$, a more practical way to obtain physically meaningful images is to separate the P- and S-waves in the elastic wavefields. 
 \end{hangparas}
 
-P/S separation and decomposition techniques in both isotropic \citep{morse53, sun99, wenlong15} and anisotropic \citep{dellinger90,zhang10} media are proposed. \citet{cheng14}, \citet{cheng16} and \citet{Sripanich16} use global low-rank approximations to separate and decompose the P- and S-waves in anisotropic media. \citet{wenlong17} make the algorithm scalable by proposing localized low-rank approximations (LLA) and implement the algorithm in a domain-decomposed configuration for parallel computation.
+P/S separation and decomposition techniques in both isotropic \citep{morse53, sun99, wenlong15} and anisotropic \citep{dellinger90,zhang10} media are proposed. \citet{cheng14}, \citet{cheng16} and \citet{Sripanich16} use global low-rank approximations to separate and decompose the P- and S-waves in anisotropic media. \citet{wenlong18} make the algorithm scalable by proposing localized low-rank approximations (LLA) and implement the algorithm in a domain-decomposed configuration for parallel computation.
 
 Some attemps have been made to generate RTM images using elastic wave equations \citep{yan07,wenlong15b,wang16}, but the anisotropic elastic RTM with global low-rank approximation for P/S separation remains too expensive, and the improvements in elastic images cannot be identified as no comparisons with other RTMs are yet available.
 
@@ -85,7 +81,7 @@ In this paper, we  apply a highly-efficient LLA-based P/S separation in anisotro
 
 This paper is organized as follows. First, the P/S separation algorithms are briefly reviewed. Then the image condition is introduced, and the different physical quantities of pesudoacoustic and elastic wavefields are analyzed. Finally, migrated images produced by the three RTM schemes are compared. 
 %At last the costs are analyzed.
-To have a fair comparison, the sources and receivers in our RTM tests are placed in a water layer; the corresponding single-component pressure data are used as input to all the RTMs. Although the S-waves can be separated in an elastic wavefield, special techniques need to be applied to correct the polarities for stacking, which is complicated and error-prone, so here, only P-wave (PP) images are generated and compared.
+To have a fair comparison, the sources and receivers in our RTM tests are placed in a water layer; the corresponding single-component pressure data are used as input to all the RTMs. Although the S-waves can be separated in an elastic wavefield, special techniques need to be applied to correct the polarities for stacking, so here, only P-wave (PP) images are generated and compared.
 
 \tabl{tbl1}{
 Subsalt model parameters
@@ -102,7 +98,7 @@ Subsalt model parameters
 }
 \section{Wavefield separation} 
 \indent\indent
-Three RTM schemes (ARTM, DIV-ERTM and LLA-ERTM) are compared in this paper. ARTM is based on pseudo-acoustic wave equations and propagates single component data and thus doesn't require P/S separation. Elastic wave equations propagate coupled P and S wavefields, thus P/S separation needs to be performed before applying the image conditions. 
+Three RTM schemes (ARTM, DIV-ERTM and LLA-ERTM) are compared in this paper. ARTM is based on a pseudo-acoustic wave equation and propagates single component data and thus doesn't require P/S separation. Elastic wave equations propagate coupled P and S wavefields, thus P/S separation needs to be performed before applying the image conditions. 
 
 In elastic wavefields, the Helmholtz decomposition provides the theoretical basis for separating P-waves from the coupled isotropic wavefields by using divergence operators \citep{aki80};
 \begin{equation}
@@ -114,7 +110,7 @@ u^{P}(\boldsymbol{x})=\bigtriangledown \cdot \boldsymbol{u}(\boldsymbol{x}),
 \label{eqn:div_curl}
 \end{equation}
 where $\boldsymbol{u}$ is the input coupled elastic wavefield in the space domain $\boldsymbol{x}$, and $u^{P}$ is the separated P-wavefield. 
-Equation~\ref{eqn:div_curl} cannot give cleanly separated P-waves in anisotropic media as demonstrated in the following example (Figures~\ref{fig:snap_homo_cpl2.eps} and \ref{fig:snap_homo_sep2.eps}), but it is attractive because the operation is in the space domain, and the calculation is easy and fast. DIV-ERTM uses equation~\ref{eqn:div_curl} to separate the P-waves. In the wavenumber domain, equation~\ref{eqn:div_curl} has the form
+Equation~\ref{eqn:div_curl} cannot cleanly separate P-waves in anisotropic media as demonstrated in the following example (Figures~\ref{fig:snap_homo_cpl2.eps} and \ref{fig:snap_homo_sep2.eps}), but it is attractive because the operation is in the space domain, and the calculation is easy and fast. DIV-ERTM uses equation~\ref{eqn:div_curl} to separate the P-waves. In the wavenumber domain, equation~\ref{eqn:div_curl} has the form
 \begin{equation}
 %\begin{aligned}
 u^{P}(\boldsymbol{k})=i \boldsymbol{k} \cdot \boldsymbol{u}(\boldsymbol{k}),
@@ -123,7 +119,7 @@ u^{P}(\boldsymbol{k})=i \boldsymbol{k} \cdot \boldsymbol{u}(\boldsymbol{k}),
 %\end{aligned}
 \label{eqn:div_curl_k}
 \end{equation}
-where $\boldsymbol{k}$ is the wavenumber. Equation~\ref{eqn:div_curl_k} indicates that the P-wave is separated by projecting the waves in the wavenumber domain to their propagation directions $\boldsymbol{k}$, which is the same as the P-wave polarization directions in isotropic media. However, in anisotropic media, the P-wave polarizations are not parallel to their propagation directions, and are called $quasi-P$ (qP) waves. \citet{dellinger90} extend equation~\ref{eqn:div_curl_k} to anisotropic media using
+where $\boldsymbol{k}$ is the wavenumber. Equation~\ref{eqn:div_curl_k} indicates that the P-wave is separated by projecting the waves in the wavenumber domain to their propagation directions $\boldsymbol{k}$, which are the same as the P-wave polarization directions in isotropic media. However, in anisotropic media, the P-wave polarizations are not parallel to their propagation directions, and are called $quasi-P$ (qP) waves. \citet{dellinger90} extend equation~\ref{eqn:div_curl_k} to anisotropic media using
 \begin{equation}
 %\begin{aligned}
 u^{qP}(\boldsymbol{k})=i \boldsymbol{A}^{qP}(\boldsymbol{k}) \cdot \boldsymbol{u}(\boldsymbol{k}).
@@ -140,22 +136,22 @@ where $\boldsymbol{A}^{qP}$ is the normalized qP-wave polarization direction, wh
 In equation~\ref{eqn:christoffel}, $\boldsymbol{I}$ is the unit diagonal matrix; $\Gamma_{ik}=C_{ijkl}K_jK_l$, where $C_{ijkl}$ is the elastic stiffness tensor; $K_j$ and $K_l$ are components of the normalized plane-wave-propagation direction \citep{zhang10}, and $i,j,k,l = x,y,z$. $\rho V_{qP}^2$ is an eigenvalue of matrix $\boldsymbol{\Gamma}$, which corresponds to the qP-wave mode. The polarization of the qP-wave is described with the corresponding eigenvector $\boldsymbol{A}^{qP}$. 
 
 The qP-wave polarization $\boldsymbol{A}^{qP}$ is a space-wavenumber mixed-domain operator for inhomogeneous media, and is large and difficult to calculate. Cheng and Fomel (\citeyear{cheng14}) propose a low-rank representation of $\boldsymbol{A}^{qP}$.
-\citet{wenlong17} suggest using localized low-rank approximations (LLA); the benefits include increased scalability and efficiency for parallel computation.  
+\citet{wenlong18} suggest using localized low-rank approximations (LLA); the benefits include increased scalability and efficiency for parallel computation.  
 
-$\boldsymbol{A}^{qP}$ is a normalized vector operator; to generate comparable results with the divergence operator (equation~\ref{eqn:div_curl_k}), $\boldsymbol{A}^{qP}$ can be scaled by the wavenumber magnitude $||\boldsymbol{k}||$, and the separation of qP with LLA becomes 
+$\boldsymbol{A}^{qP}$ is a normalized vector operator; to generate comparable results with the divergence operator (equation~\ref{eqn:div_curl_k}), $\boldsymbol{A}^{qP}$ can be scaled by the wavenumber magnitude $|\boldsymbol{k}|$, and the separation of qP with LLA becomes 
 \begin{equation}
-u^{qP}(\boldsymbol{k})=i||\boldsymbol{k}||\boldsymbol{A}^{qP} \cdot \boldsymbol{u}(\boldsymbol{k}).
+u^{qP}(\boldsymbol{k})=i|\boldsymbol{k}|\boldsymbol{A}^{qP} \cdot \boldsymbol{u}(\boldsymbol{k}).
 \label{eqn:div_curl_ak1}
 \end{equation}
-As all examples in this paper are in anisotropic media, we use P- and S-waves to represent qP- and qS-waves in anisotropic wavefields for simplicity.
+As all examples in this paper are in anisotropic media, for simplicity, we use P- and S-waves to represent qP- and qS-waves in anisotropic wavefields.
 
 We test the divergence and low-rank approximation methods for P/S separation in a homogeneous TTI model with $V_{P0}=4000~\mathrm{m/s}$, $V_{S0}=2000~\mathrm{m/s}$, $\rho=2~\mathrm{g/cm^3}$, $\delta=0.2$, $\epsilon=0.4$ and $\theta=30^\circ$. 
 The grid increments are h = 10 m and time increments dt = 0.5 ms. 
 An explosive source, is placed at the center of the grid. 
-Figures~\ref{fig:snap_homo_cpl2.eps}a and \ref{fig:snap_homo_cpl2.eps}b show a snapshot of the the $x$ and $z$ particle velocity components of the coupled elastic wavefield.
+Figures~\ref{fig:snap_homo_cpl2.eps}a and \ref{fig:snap_homo_cpl2.eps}b show a snapshot of the $x$ and $z$ particle velocity components of the coupled elastic wavefield.
 \plot{snap_homo_cpl2.eps}{width=1.0\textwidth}
 {
-(a) x and (b) z components of the coupled elastic wavefield in a homogeneous model.
+(a) x and (b) z components of the coupled elastic particle velocity wavefield in a homogeneous model.
 }
 
 The pseudo-acoustic propagator doesn't require $V_{S0}$, but generates the diamond-shaped S-wave artifacts \citep{alkhalifah00,grechka04} shown in Figure~\ref{fig:snap_homo_sep2.eps}a. The divergence operator cannot fully separate the P-waves from the coupled elastic wavefield because of the anisotropy (Figure~\ref{fig:snap_homo_sep2.eps}b). Low-rank approximation gives the cleanest P-wave snapshot (Figure~\ref{fig:snap_homo_sep2.eps}c). 
@@ -172,19 +168,19 @@ Because the acoustic wavefield and the P-waves separated from the elastic wavefi
 I(\boldsymbol{x})=\int_{0}^{T_{max}}U_s(\boldsymbol{x},t)U_r(\boldsymbol{x},t)dt,
 \label{eqn:image_cdt}
 \end{equation}
-where $U_s$ and $U_r$ are the extrapolated source and receiver wavefields. The physical quantities of $U_s$ and $U_r$ are different depending on whether the pseudoacoustic or elastic propagators are used. The conversion of the elastic vector wavefield into single scalor wavefields is presented by \citet{sun06}, \citep{wenlong15b},\citep{ting16} and \citep{tang17}. 
+where $U_s$ and $U_r$ are the extrapolated source and receiver wavefields. The physical units of $U_s$ and $U_r$ are different depending on whether the pseudoacoustic or elastic propagators are used. The conversion of the elastic vector wavefield into single scalar wavefields is presented by \citet{sun06}, \citet{wenlong15b}, \citet{ting16} and \citet{tang18}. 
 
 As pressure is recorded and used as input for all the RTMs, the extrapolated acoustic wavefields are also pressure. However, in elastic RTMs, we use particle velocity vectors for P/S separation, and the separated scalar P-waves from the source and receiver wavefields are input for elastic imaging. 
 
 %Because of the different physical quantities of the acoustic and elastic wavefields, the images from acoustic and elastic RTMs are also different. 
 %To get a general idea of the relation between the pressure in acoustic waveiflds and separated P-waves in elastic wavefields, we use a part of the 2D isotropic acoustic wave equation to describe
-An example relation between pressure and separated P-wave can be found in a part of the 2D isotropic acoustic wave equation
+An example relation between pressure and the separated P-wave can be found in the 2D isotropic acoustic wave equation
 \begin{equation}
 \frac{\partial P}{\partial t}=(\lambda+\mu) [\bigtriangledown \cdot  \boldsymbol{v}],
 \label{eqn:relation}
 \end{equation}
-where $P$ is the pressure, $\boldsymbol{v}$ is the particle velocity, and $\lambda$ and $\mu$ are Lam$\acute{\mathrm{e}}$ parameters. The term in the square brackets in equation~\ref{eqn:relation} has the form of a P-wave separated with the divergence operator; this physical quantity is the same as that obtained with LLA separation results using equation~\ref{eqn:div_curl_ak1}. 
-To generate comparable results from both acoustic and elastic RTMs, we perform an additional time derivative to the source wavelet and input seismic traces in ARTM, so at least the phase of ARTM images agree with those from DIV-ERTM and LR-ERTM, but the amplitudes are still different depending on the model parameters at each grid point.
+where $P$ is the pressure, $\boldsymbol{v}$ is the particle velocity, and $\lambda$ and $\mu$ are Lam$\acute{\mathrm{e}}$ parameters. The term in the square brackets in equation~\ref{eqn:relation} has the form of a P-wave separated by the divergence operator $\bigtriangledown \cdot$; this physical quantity is the same as that obtained with LLA separation results using equation~\ref{eqn:div_curl_ak1}. 
+To generate comparable results from both acoustic and elastic RTMs, we perform an additional time derivative of the source wavelet and input seismic traces in ARTM, so the phase of ARTM images agree with that from DIV-ERTM and LR-ERTM, but the amplitudes are still different depending on the model parameters at each grid point.
 %The major difference between $P$ and the separated P-wave $\bigtriangledown \cdot \boldsymbol{v}$ is   
 %The differences between acoustic and elastic wavefields include a scaling of the model parameters and a time derivative.
  %which causes lower resolution of the acoustic images (the crosscorrelation of pressures) than of the elastic images (the crosscorrelation of separated P-waves) (equation~\ref{eqn:relation}).
@@ -195,14 +191,14 @@ Another possible option for the image condition is to use the FWI gradient of th
 
 \section{Anisotropic elastic migration tests}
 \indent\indent
-In this section, the three diffierent RTM schemes are compared using synthetic examples. We use 2D Lebedev staggered-grid finite-difference scheme \citep{vadim10} to solve the stress-particle velocity formulation of the anisotropic acoustodynamic and elastodynamic equations. We use second-order in time and eighth-order in space finite-differences, and convolutional perfectly matched layer (CPML) absorbing boundary conditions \citep{komatitsch07} are used on all four grid edges 
+In this section, the three different RTM schemes are compared using synthetic examples. We use a 2D Lebedev staggered-grid finite-difference scheme \citep{vadim10} to solve the stress-particle velocity formulation of the anisotropic acoustodynamic and elastodynamic equations. We use second-order in time and eighth-order in space finite-differences, and convolutional perfectly matched layer (CPML) absorbing boundary conditions \citep{komatitsch07} are used on all four grid edges 
 to reduce edge reflections. All the shot gathers are generated using anisotropic elastic wave equations, and are used as input for all the RTMs. 
-We use the correct parameter models for elastic and acoustic migrations, and $V_{S0}$ is set to be zero for ARTM. 
+We use the correct parameter models for elastic and acoustic migrations, and $V_{S0}$ is set to zero for ARTM. 
 
 \subsection{Subsalt model test}
 \indent\indent
-The first test is performed on a subsalt model (Figure~\ref{fig:model_subsalt.eps}) with the Thomsen (\citeyear{thomsen86}) anisotropy parameters ($\epsilon$ and $\delta$) in Table~1. $\theta$ is the tilt angle of the axis of symmetry with reference to the vertical direction (and increasing clockwise).
-One-hundred explosive sources are initiated from (x, z) = (50.0, 0.0) m to  (5000.0, 0.0) m with 50 m separation in the x direction. Five hundred and two receivers are placed from (0.0, 0.0) to (5010.0, 0.0) m with 10 m separation. The receivers have fixed positions and record seismograms from all sources. The sources have Ricker time wavelets with dominant frequency of 15 Hz. 
+The first test is performed on a subsalt model (Figure~\ref{fig:model_subsalt.eps}) with the Thomsen (\citeyear{thomsen86}) anisotropy parameters ($\epsilon$ and $\delta$) in Table~1. $\theta$ is the tilt angle of the axis of symmetry with reference to the vertical direction (and increases clockwise).
+One-hundred explosive sources are initiated from (x, z) = (50.0, 0.0) m to  (5000.0, 0.0) m with 50 m separation in the x direction. Five hundred and two receivers are placed from (x, z) = (0.0, 0.0) to (5010.0, 0.0) m with 10 m separation. The receivers have fixed positions and record seismograms from all sources. The sources have Ricker time wavelets with dominant frequency of 15 Hz. 
 The grid increments are h = 10 m for both x and z directions, and the simulation time-step dt = 0.5 ms. 
 \plot{model_subsalt.eps}{width=0.8\textwidth}
 {
@@ -216,8 +212,8 @@ The subsalt model ($V_{P0}$) with the anisotropic parameters listed in Table 1. 
 %{x component of the coupled HTI wavefield.}
 %\plot{./Fig/Snapshot_homo/vti/lebedev/figure_vz_760.eps}{width=0.8\textwidth}
 %{z component of the coupled HTI wavefield.}
-We run the ARTM, DIV-ERTM and LLA-ERTM on this subsalt model, and all the RTMs are performed in a 3 (x) by 4 (z) domain decomposition configuration (1.67 km $\times$ 0.5 km for each subdomain; see the yellow dashed lines in Figure~\ref{fig:model_subsalt.eps}). Overlap zones are added to reduce boundary artifacts between adjoint subdomains, and the width of the overlap zones is 80 m on each of the domain edges. In each subdomain, the LLA-ERTM has a rank number of 3 for P/S separation.
-The stacked images from ARTM, DIV-ERTM and LLA-ERTM are shown in Figures~\ref{fig:image_subsalt.eps}a, \ref{fig:image_subsalt.eps}b and \ref{fig:image_subsalt.eps}c, respectively. The elastic images (b) and (c) have better illumination in the subsalt (see in the black boxes) area than the acoustic image (a) does. That is because the P-waves reflected from the subsalt reflector cannot penetrate the salt body because of the large incident angles and the large impedance contrast between the salt and the sediments. 
+We run the ARTM, DIV-ERTM and LLA-ERTM on data for this subsalt model, and all the RTMs are performed in a 3 (x) by 4 (z) domain decomposition configuration (1.67 km $\times$ 0.5 km for each subdomain; see the yellow dashed lines in Figure~\ref{fig:model_subsalt.eps}). Overlap zones are added to reduce boundary artifacts between adjacent subdomains, and the width of the overlap zones is 80 m on each of the domain edges. In each subdomain, the LLA-ERTM has a rank number of 3 for P/S separation.
+The stacked images from ARTM, DIV-ERTM and LLA-ERTM are shown in Figures~\ref{fig:image_subsalt.eps}a, \ref{fig:image_subsalt.eps}b and \ref{fig:image_subsalt.eps}c, respectively. In this, and the following example, we use automatic gain control (AGC) to balance the amplitudes. The elastic images (b) and (c) have better illumination in the subsalt (see in the black boxes) area than the acoustic image (a) does. That is because the P-waves reflected from the subsalt reflector cannot penetrate the salt body because of the large incident angles and the large impedance contrast between the salt and the sediments (Figure~\ref{fig:model_subsalt.eps}). 
 %was blocked by the salt flank (see the ray path sketches on Figure~\ref{fig:model_subsalt.eps}). 
 However, the reflection can be carried through the salt body by converted S-waves, which are again converted to P-waves before being recorded by the receivers
 %the converted S-waves at the flank of the salt can carry the reflection through the saltbody and convert to P-waves (pressure) to be recorded in the seismogram 
@@ -232,18 +228,18 @@ As demonstrated in Figure~\ref{fig:snap_homo_sep2.eps}, low-rank approximation b
 
 \subsection{SEAM model test}
 \indent\indent
-The model for the second 2D migration test is a 2D line from the 3D anisotropic SEAM model \citep{fehler11} (Figure~\ref{fig:model_seam2d.eps}). Three hundred and twenty one explosive sources are initiated from (x, z) = (8000.0, 0.0) m to  (40000.0, 0.0) m with 100 m separation in the x direction. Three hundred and eighty receivers are evenly placed from (X-7980.0, 0.0) to (X-400.0, 0.0), where X is the x position of the source. The receivers are placed at the left side of each source with 20 m separation. The sources have Ricker time wavelets with dominant frequency of 15 Hz. The grid increments are h = 5 m for both x and z directions, and the time increment dt = 0.5 ms.
+The model for the second migration test is a 2D slice from the 3D anisotropic SEAM model \citep{fehler11} (Figure~\ref{fig:model_seam2d.eps}). Three hundred and twenty one explosive sources are initiated from (x, z) = (8000.0, 0.0) m to  (40000.0, 0.0) m with 100 m separation in the x direction. Three hundred and eighty receivers are evenly placed from (X-7980.0, 0.0) to (X-400.0, 0.0), where X is the x position of the source. The receivers are placed at the left side of each source, with 20 m separation. The sources have Ricker time wavelets with dominant frequency of 15 Hz. The grid increments are h = 5 m for both x and z directions, and the time increment dt = 0.5 ms.
 
-Again, we run the 2D ARTM, DIV-ERTM and LLA-ERTM with a 16 by 16 domain decomposition (2.5 $\times$ 0.94 km for each subdomain; see the dashed lines in Figure~\ref{fig:model_seam2d.eps}a), and the overlap is 40 m on each of the domain edges. The LLA-ERTM has a rank number of 6 in each subdomain for P/S separation. The stacked images are shown in Figures~\ref{fig:image_seam2d.eps}a, \ref{fig:image_seam2d.eps}b and \ref{fig:image_seam2d.eps}c, respectively. All the RTMs give reasonable images; the differences between them can be found in the details.
-Two parts of the images are zoomed-in for analysis. One is the subsalt area (the blue boxes in Figure~\ref{fig:image_seam2d.eps}), and the corresponding ARTM, DIV-ERTM and LLA-ERTM images are replotted in Figure~\ref{fig:image2_seam2d.eps}a, \ref{fig:image2_seam2d.eps}c and \ref{fig:image2_seam2d.eps}e, respectively. 
-The second zoomed part is the sediments in the blue boxes in Figure~\ref{fig:image_seam2d.eps}, and the corresponding RTM images are shown in Figure~\ref{fig:image2_seam2d.eps}b, \ref{fig:image2_seam2d.eps}d and \ref{fig:image2_seam2d.eps}f, respectively.
+Again, we run the 2D ARTM, DIV-ERTM and LLA-ERTM with a 16 by 16 domain decomposition (2.5 $\times$ 0.94 km for each subdomain; see the dashed lines in Figure~\ref{fig:model_seam2d.eps}a); the overlap is 40 m on each of the domain edges. The LLA-ERTM has a rank number of 6 in each subdomain for P/S separation. The stacked images are shown in Figures~\ref{fig:image_seam2d.eps}a, \ref{fig:image_seam2d.eps}b and \ref{fig:image_seam2d.eps}c, respectively. All three RTMs give reasonable images; the differences between them occur in the details.
+Two parts of the images are zoomed-in for analysis. Part 1 is the red-boxed area in Figure~\ref{fig:image_seam2d.eps}; the corresponding ARTM, DIV-ERTM and LLA-ERTM images are replotted in Figure~\ref{fig:image2_seam2d.eps}a, \ref{fig:image2_seam2d.eps}c and \ref{fig:image2_seam2d.eps}e, respectively. 
+Part 2 is the blue-boxed area in Figure~\ref{fig:image_seam2d.eps}; the corresponding RTM images are shown in Figure~\ref{fig:image2_seam2d.eps}b, \ref{fig:image2_seam2d.eps}d and \ref{fig:image2_seam2d.eps}f, respectively.
 
-For the subsalt area, the DIV-RTM (Figure~\ref{fig:image2_seam2d.eps}c) and LLA-RTM (Figure~\ref{fig:image2_seam2d.eps}e) give clearer images than ARTM (Figure~\ref{fig:image2_seam2d.eps}a) for the structures in the red boxes. 
-The events that meet the salt flank tend to smear (marked by blue arrows) in the ARTM image, where elastic RTMs give better image quality at the same positions.
+For part 1, the DIV-RTM (Figure~\ref{fig:image2_seam2d.eps}c) and LLA-RTM (Figure~\ref{fig:image2_seam2d.eps}e) give clearer images than ARTM (Figure~\ref{fig:image2_seam2d.eps}a) for the structures in the red boxes. 
+The events that meet the salt flank tend to smear (marked by red arrows) in the ARTM image, where elastic RTMs give better image quality at the same positions.
 The reason is the involvement of S-waves as explained in the previous example. 
 %The structures in the subsalt areas (the red boxes in Figure~\ref{fig:image2_seam2d.eps}) are clearer in the elastic wave equation based RTM images (Figures~\ref{fig:image2_seam2d.eps}c and \ref{fig:image2_seam2d.eps}e) than the acoustic wave equation based RTM image (Figure~\ref{fig:image2_seam2d.eps}a). 
 
-In the sedimentary area, the ARTM image (Figure~\ref{fig:image2_seam2d.eps}b) contain a lot of high frequency noise, caused by the diamond-shaped S-wave artifacts. Such noise doesn't exist in elastic RTMs. 
+In part 2, the ARTM image (Figure~\ref{fig:image2_seam2d.eps}b) contains a lot of high frequency noise, caused by the diamond-shaped S-wave artifacts. Such noise doesn't exist in the elastic RTMs. 
 A false dipping structure (indicated by the black arrows) is observed in the DIV-ERTM image (Figure~\ref{fig:image2_seam2d.eps}d), and is caused by incomplete P/S separation obtained using divergence operators. 
 The false structure is not found in the LLA-ERTM image (Figure~\ref{fig:image2_seam2d.eps}f), because the P/S separation algorithm is more accurate.
 %doesn't exist in the LLA-ERTM image (Figure~\ref{fig:image2_seam2d.eps}f), as LLA-ERTM uses a better P/S separation algorithm. 
@@ -254,7 +250,7 @@ A 2D slice from the 3D SEAM model.
 (b) is the $V_{S0}$ model; 
 (c) is the $\epsilon$ model; 
 (d) is the $\delta$ model; 
-(a) is the $\theta$ model; the density $\rho$ has a constant value of 1.0 g/cm$^3$. The dashed lines in (a) indicate the 16 $\times$ 16 domain decomposition.
+(e) is the $\theta$ model; the density $\rho$ has a constant value of 1.0 g/cm$^3$. The dashed lines in (a) indicate the 16 $\times$ 16 domain decomposition.
 }
 \plot{image_seam2d.eps}{width=0.8\textwidth}
 {
@@ -264,10 +260,10 @@ A 2D slice from the 3D SEAM model.
 \plot{image2_seam2d.eps}{width=0.95\textwidth}
 {
 \small{
-(a), (c) and (e) are the zoomed-in parts of subsalt area of the ARTM, DIV-ERTM and LLA-ERTM images (in the red boxes in Figure~\ref{fig:image_seam2d.eps}), respectively; 
-(b), (d) and (f) are the zoomed-in parts of sedimentary parts of the ARTM, DIV-ERTM and LLA-ERTM images (in the blue boxes in Figure~\ref{fig:image_seam2d.eps}), respectively.
-Note that the elastic images (c) and (e) have better illumination than (a) in the subsalt area; events marked by the blue arrow tend to smear in (a).
-The acoustic image (b) contains many high frequency artifacts. The LLA-ERTM image (f) doesn't have the false structure in the DIV-ERTM image (d) as marked by the black arrows.}
+(a), (c) and (e) are the zoomed-in parts of the red-boxed area (in Figure~\ref{fig:image_seam2d.eps}) of the ARTM, DIV-ERTM and LLA-ERTM images, respectively; 
+(b), (d) and (f) are the zoomed-in parts of the blue-boxed area (in Figure~\ref{fig:image_seam2d.eps}) of the ARTM, DIV-ERTM and LLA-ERTM images, respectively.
+Note that the elastic images (c) and (e) have better illumination than (a) in the subsalt area; events marked by the red arrow tend to smear in (a).
+The acoustic image (b) contains many high frequency artifacts. The LLA-ERTM image (f) doesn't have the false structures in the DIV-ERTM image (d) as marked by the black arrows.}
 }
 
 %\plot{image2_seam2d_single1.eps}{width=0.7\textwidth}
@@ -298,31 +294,30 @@ The acoustic image (b) contains many high frequency artifacts. The LLA-ERTM imag
 %-----------------------------------------
 \section{Discussion}
 \indent\indent
-In both migration tests, the elastic RTMs shows better images than those from pseudo-acoustic RTMs. LLA-ERTM exhibits better image quality than DIV-ERTM in the subsalt model (Figure~\ref{fig:model_subsalt.eps}), but the improvements are not significant in the SEAM model (Figure~\ref{fig:model_seam2d.eps}). A possible reason is that the subsalt model (Figure~\ref{fig:model_subsalt.eps}) has stronger anisotropy than the SEAM model (Figure~\ref{fig:model_seam2d.eps}), making the advantage of LLA more noticeable in the former. 
+In both migration tests, the elastic RTMs show better images than those from the pseudo-acoustic RTMs. LLA-ERTM exhibits better image quality than DIV-ERTM in the subsalt model (Figure~\ref{fig:model_subsalt.eps}), but the improvements are not significant in the SEAM model (Figure~\ref{fig:model_seam2d.eps}). A possible reason is that the subsalt model (Figure~\ref{fig:model_subsalt.eps}) has stronger anisotropy than the SEAM model (Figure~\ref{fig:model_seam2d.eps}), making the advantage of LLA more noticeable in the former. 
 
 Elastic RTMs require S-wave velocities as input, which are not commonly obtained with traditional seismic processing procedures. In this situation, the S-wave velocities of sediments can be roughly approximated from the P-wave velocities, and S-wave velocities of the salt can be obtained from core analysis and laboratory measurements. P/S separation can be regarded as a filter that removes the S-waves before applying a (PP) image condition, but note that separated P-waves contain more information than pseudo-acoustic waves as the former contain P-S-P converted waves, which provide information for subsalt imaging.
 %remember that the a part of the remaining P-waves are converted from S-waves that provide information for subsalt imaging.
 
 % elastic wave equations can also be used, because the most essential S-wave velocity in the salt is easy to know, and other S-wave velocities can be roughly approximated from the P-wave velocities. P/S separation can be regarded as a filter that removes the S-waves before apply a (PP) image condition, but remember that the a part of the remaining P-waves are converted from S-waves that provide information for subsalt imaging.
 
-With many benefits of using elastic equations for RTM, we must also notice that elastic wavefields are more complicated than acoustic wavefields even with good P/S separation algorithms. Multi-conversions happen especially where salt is present, and it is difficult to correctly migrate those reflections because not all of the energy is back-propagated correctly on the multi-converted paths. Some of these multi-converted P-waves appear as artifacts in the images (see the artifacts at salt flanks in Figure~\ref{fig:image_subsalt.eps}a-\ref{fig:image_subsalt.eps}c). 
+With many benefits of using elastic equations for RTM, we must also notice that elastic wavefields are more complicated than acoustic wavefields even with good P/S separation algorithms. Multi-conversions occur, especially where salt is present, and it is difficult to correctly migrate those reflections because not all of the energy is back-propagated correctly on the converted paths. Some of these multi-converted P-waves appear as artifacts in the images (see the artifacts at the salt flanks in Figure~\ref{fig:image_subsalt.eps}a-\ref{fig:image_subsalt.eps}c). 
 A possible solution of this problem is to use least squares ERTM \citep{duan16}, which requires more computation and a good S-velocity model; 
-another way is to separate the primary P-P reflections from multi-converted P-P waves by applying filtering in the hyperbolic Radon domain.
+another way is to separate the primary P-P reflections from the multi-converted P-P waves by filtering in the hyperbolic Radon domain.
 %further investigations need to be made to better handle this issue.
 
-The localized low-rank approximation provides the basis for scalable and affordable anisotropic elastic RTMs with accurate P/S separation. It has the potential to be applied in anisotropic elastic full-wave inversions. For the LLA algorithm, the separations at overlap zones between subdomains may not be as good as inside the subdomains depending on the ratio of overlap length and dominant wavelength \citep{wenlong17}. 
+The localized low-rank approximation provides the basis for scalable and affordable anisotropic elastic RTMs with accurate P/S separation. It has the potential to be applied in anisotropic elastic full-wave inversions. For the LLA algorithm, the separations in the overlap zones between subdomains may not be as good as inside the subdomains depending on the ratio of overlap length and dominant wavelength \citep{wenlong18}. 
 
-In this paper, only LLA P/S separation is used, to make the results comparable with the divergence operators. LLA also can do P/S decomposition which preserves the vector components of P- and S-waves. A future project will use LLA P/S decomposition to generate both PP and PS images from anisotropic elastic RTMs. The interests of ERTM, with P-S separation go beyond the presented results in this paper, as the inputs are single component pressure data for comparison with ARTM, while ERTM is ideal for imaging multicomponent land and ocean-bottom data.
+In this paper, only LLA P/S separation is used, to make the results comparable with the divergence operators. LLA also can do P/S decomposition which preserves the vector components of the P- and S-waves. A future project will use LLA P/S decomposition to generate both PP and PS images from anisotropic elastic RTMs. Interest in ERTM, with P/S separation, goes beyond the present results in this paper, as the inputs are single component pressure data for comparison with ARTM, while ERTM is ideal for imaging multicomponent land and ocean-bottom data.
 
 \section{Conclusions}
 \indent\indent
 %During this internship, I complete 2D and 3D codes for low-rank approximation and applied to PS separation/decomposition; further improve the efficiency with localized low-rank approximation, and make it compatiable with domain decomposition (MPI) configuration. I reduce the FFT truncation artifacts by applying overlapping windows, and analyze the cost and benefits of PS separation/decomposition. Finally, Ia pply the low-rank separated waves in anisotropic elastic RTMs.
-We compared three anisotropic RTM schemes using pseudo-acoustic wave equations, elastic wave equations with divergence, and localized low-rank approximation for P/S separations, respectively. Tests with synthetic data show that RTMs with elastic wave equations have better illumination than RTMs with pseudo-acoustic wave equations, because the former uses converted S-waves which offer a greater range of angular illumination and penetrate the salt body better than P-waves only. Localized low-rank approximation provides better P/S separation results, thus the LLA-ERTM images have less artifacts than those from DIV-ERTMs. 
+We compare three anisotropic RTM schemes using pseudo-acoustic wave equations, elastic wave equations with divergence, and localized low-rank approximation for P/S separations, respectively. Tests with synthetic data show that RTMs with elastic wave equations have better illumination than RTMs with pseudo-acoustic wave equations, because the former uses converted S-waves which offer a greater range of angular illumination and penetrate the salt body better than P-waves only. Localized low-rank approximation provides better P/S separation results, thus the LLA-ERTM images have fewer artifacts than the DIV-ERTM images. 
 
-\section{Acknowledgments}
-\indent\indent
-%I'd like to thank Dr. Biaolong Hua and Dr. Bertrand Duquet for this opportunity, and so many helpful comments, remarks and access to Total computation utilities. I'm grateful of Dr. Huimin Guan, Dr. Fuchun Gao and Dr. Linbin Zhang for productive discussions. I'm appreciate that Jason provided the TTI kernel. I also thank Mrs. Cathy Field and Pauline Sanseau for the help of onbording and all colleagues of Geophysics department for the kind encouragements.
-The research leading to this paper is supported by Total Inc., the Sponsors of the UT-Dallas Geophysical Consortium, and Outstanding Young Talent Program (AUGA5710053217) from Harbin Institute of Technology. This paper is Contribution No. XXXX from the Department of Geosciences at the University of Texas at Dallas.
+%\section{Acknowledgments}
+%\indent\indent
+%The research leading to this paper is supported by Total Inc., the Sponsors of the UT-Dallas Geophysical Consortium, and Outstanding Young Talent Program (AUGA5710053217) from Harbin Institute of Technology. This paper is Contribution No. XXXX from the Department of Geosciences at the University of Texas at Dallas.
 
 
 
